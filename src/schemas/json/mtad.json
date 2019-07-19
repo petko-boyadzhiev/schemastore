@@ -66,8 +66,9 @@
                         "pattern": "^[A-Za-z0-9_\\-\\.]+$"
                     },
                     "type": {
-                        "description": "The module type that defines the design-time tools for the module.",
-                        "type": "string"
+                        "description": "The module type that defines the design-time tools for the module. Some module types are SAP Cloud Foundry specific.",
+                        "type": "string",
+                        "enum": ["application", "binary", "business-logging", "com.sap.application.content", "com.sap.html5.application-content", "com.sap.portal.site-content", "com.sap.xs.hdi", "com.sap.xs.hdi-dynamic", "custom", "dotnet_core"]
                     },
                     "description": {
                         "description": "A free text describing this module.",
@@ -94,7 +95,7 @@
                     },
                     "parameters": {
                         "description": "Configuration parameters that are used when deploying the module to the target runtime environment.",
-                        "type": "object"
+                        "$ref": "#/definitions/module-parameters"
                     },
                     "parameters-metadata": {
                         "description": "Additional information about the module's parameters.",
@@ -346,6 +347,61 @@
         }
     },
     "definitions": {
+        "module-parameters": {
+            "description": "Some parameters are SAP Cloud Foundry specific.",
+            "type": "object",
+            "properties": {
+                "buildpack":{
+                    "description": "Binary runtime.",
+                    "type": "string"
+                },
+                "content-target":{
+                    "description": "Specify that the resource would be used as a target for the module content deployment.",
+                    "type": "boolean"
+                },
+                "no-route":{
+                    "description": "Defines if a route should be assigned to the application.",
+                    "type": "boolean"
+                },
+                "memory":{
+                    "description": "Defines the memory allocated to the application.",
+                    "type": "string",
+                    "pattern": "^[1-9][0-9]*(?i)(M|MB|G|GB)$"
+                },
+                "execute-app":{
+                    "description": "Defines whether the application is executed. If yes, the application performs certain amount of work and upon completion sets a success-marker or failure-marker by means of a log message.",
+                    "type": "boolean"
+                },
+                "success-marker":{
+                    "description": "Defines the memory allocated to the application.",
+                    "type": "string",
+                    "pattern": "^(STDOUT|STDERR):.+$"
+                },
+                "failure-marker":{
+                    "description": "Defines the memory allocated to the application.",
+                    "type": "string",
+                    "pattern": "^(STDOUT|STDERR):.+$"
+                },
+                "stop-app":{
+                    "description": "Defines if the application should be stopped after execution.",
+                    "type": "boolean"
+                },
+                "check-deploy-id":{
+                    "description": "Defines if the deployment (process) ID should also be checked when checking the application execution status.",
+                    "type": "boolean" 
+                },
+                "dependency-type":{
+                    "description": "Defines the memory allocated to the application.",
+                    "type": "string",
+                    "enum": ["hard", "soft"]
+                },
+                "health-check-type":{
+                    "description": "Defines if the module should be monitored for availability.",
+                    "type": "string",
+                    "enum": ["hard", "soft"]
+                }
+            }
+        },
         "properties-metadata": {
             "type": "object",
             "additionalProperties": {
