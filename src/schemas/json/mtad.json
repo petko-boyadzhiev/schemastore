@@ -66,7 +66,7 @@
                         "pattern": "^[A-Za-z0-9_\\-\\.]+$"
                     },
                     "type": {
-                        "description": "The module type that defines the design-time tools for the module. Some module types are SAP Cloud Foundry specific.",
+                        "description": "The module type that defines the design-time tools for the module.",
                         "type": "string",
                         "enum": ["application", "binary", "business-logging", "com.sap.application.content", "com.sap.html5.application-content", "com.sap.portal.site-content", "com.sap.xs.hdi", "com.sap.xs.hdi-dynamic", "custom", "dotnet_core"]
                     },
@@ -199,7 +199,8 @@
                     },
                     "type": {
                         "description": "The resource type that defines the design-time tools for the resource.",
-                        "type": "string"
+                        "type": "string",
+                        "enum": ["org.cloudfoundry.managed-service", "org.cloudfoundry.existing-service", "org.cloudfoundry.existing-service-key", "org.cloudfoundry.user-provided-service", "configuration"]
                     },
                     "active": {
                         "description": "If a resource is declared to be active, it is allocated and bound according to declared requirements. Default value is true.",
@@ -223,7 +224,7 @@
                     },
                     "parameters": {
                         "description": "Parameters can be used to influence the behavior of tools which interpret this descriptor. Parameters are not made available to requiring modules at runtime. Untyped resources cannot have parameters.",
-                        "type": "object"
+                        "$ref": "#/definitions/resource-parameters"
                     },
                     "parameters-metadata": {
                         "description": "Additional information about the resource's parameters.",
@@ -348,7 +349,6 @@
     },
     "definitions": {
         "module-parameters": {
-            "description": "Some parameters are SAP Cloud Foundry specific.",
             "type": "object",
             "properties": {
                 "buildpack":{
@@ -398,7 +398,69 @@
                 "health-check-type":{
                     "description": "Defines if the module should be monitored for availability.",
                     "type": "string",
-                    "enum": ["hard", "soft"]
+                    "enum": ["port", "process", "http"]
+                },
+                "health-check-timeout":{
+                    "description": "The timeout is the amount of time (in seconds) allowed to elapse between starting up an app and the first healthy response.",
+                    "type": "integer"
+                },
+                "custom-http-endpoint":{
+                    "description": "A http health check defaults to using '/' as its endpoint, but you can specify a custom endpoint.",
+                    "type": "string"
+                }
+            }
+        },
+        "resource-parameters": {
+            "type": "object",
+            "properties": {
+                "service":{
+                    "description": "Name of the service to create.",
+                    "type": "string",
+                    "enum": ["application-logs","auditlog","rabbitmq","autoscaler","portal-services","fs-storage","hana","jobscheduler","xsuaa","connectivity","destination","feature-flags","redis","ml-foundation-services","mongodb","objectstore","postgresql"]
+                },
+                "service-plan":{
+                    "description": "Name of the service plan to be used.",
+                    "type": "string"
+                },
+                "service-name":{
+                    "description": "Service instance name. Default value is the resource name.",
+                    "type": "string"
+                },
+                "config":{
+                    "description": "Map value, containing the service creation configuration, for example, url and user credentials (user and password).",
+                    "type": "object"
+                },
+                "provider-nid":{
+                    "description": "When used for cross-MTA dependency resolution the provider-nid is always 'mta'.",
+                    "type": "string",
+                    "enum": ["mta"]
+                },
+                "provider-id":{
+                    "description": "The resource from the provider MTA <mta-id>:<mta-provides-dependency-name>.",
+                    "type": "string"
+                },
+                "version":{
+                    "description": "The version of the provider MTA.",
+                    "type": "string",
+                    "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-(0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(\\.(0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\\+[0-9a-zA-Z-]+(\\.[0-9a-zA-Z-]+)*)?$"
+                },
+                "target":{
+                    "description": "The name of the organization and space in which the provider MTA is deployed.",
+                    "type": "object",
+                    "$ref": "#/definitions/resource-configuration-target"
+                }
+            }
+        },
+        "resource-configuration-target": {
+            "type": "object",
+            "properties": {
+                "org": {
+                    "description": "The org in which the configuration will be looked for",
+                    "type": "string"
+                },
+                "space": {
+                    "description": "The space in which the configuration will be looked for",
+                    "type": "string"
                 }
             }
         },
